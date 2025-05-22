@@ -12,6 +12,7 @@ const getRecipes = wrapAsync(async (req, res) => {
   }
 
   const user = await User.findById(id);
+
   if (!user) {
     throw new AppError("User not found!", 404);
   }
@@ -31,12 +32,19 @@ const getRecipes = wrapAsync(async (req, res) => {
 
 const addRecipe = wrapAsync(async (req, res) => {
   const { id } = req.params;
-  const { title, description, status, category, dueDate } = req.body;
-  if (!title || !status || !category) {
+  const { title, description, ingredients, preparationSteps } = req.body;
+
+  const img = req.file;
+
+  if (!title || !description || !ingredients || !preparationSteps) {
     throw new AppError(
-      "Please input these required fields: title, status, category",
+      "Please input these required fields: title, description, ingredients, preparationSteps",
       400
     );
+  }
+
+  if (!img) {
+    throw new AppError("Image file is required for the recipe!", 400);
   }
 
   if (!id) {
@@ -49,12 +57,36 @@ const addRecipe = wrapAsync(async (req, res) => {
     throw new AppError("Cannot find user!", 404);
   }
 
+  // --- Parse JSON string fields ---
+  let parsedIngredients;
+  try {
+    parsedIngredients = JSON.parse(ingredients);
+  } catch (error) {
+    throw new AppError(
+      "Invalid format for ingredients. Please send as a JSON array.",
+      400
+    );
+  }
+
+  let parsedPreparationSteps;
+  try {
+    parsedPreparationSteps = JSON.parse(preparationSteps);
+  } catch (error) {
+    throw new AppError(
+      "Invalid format for preparation steps. Please send as a JSON array.",
+      400
+    );
+  }
+
   const newRecipe = new Recipe({
     title,
     description,
-    status,
-    category,
-    dueDate,
+    img: {
+      data: img.buffer, // The actual image binary data
+      contentType: img.mimetype, // The MIME type of the image
+    },
+    ingredients: parsedIngredients,
+    preparationSteps: parsedPreparationSteps,
   });
 
   //   Push the new recipe id to the user's recipe array.
@@ -74,11 +106,11 @@ const addRecipe = wrapAsync(async (req, res) => {
 const updateRecipe = wrapAsync(async (req, res) => {
   const { id, recipeId } = req.params;
   const { recipe } = req.body;
-  const { title, description, status, category, dueDate } = recipe;
+  const { title, description, img, ingredients, preparationSteps } = recipe;
 
-  if (!title || !status || !category || !recipeId) {
+  if (!title || !description || !img || !ingredients || !preparationSteps) {
     throw new AppError(
-      "Please fill these required fields: title, status, category, and recipe ID",
+      "Please fill these required fields: title, description, img, ingredients, preparationSteps, and recipe ID",
       400
     );
   }
@@ -100,7 +132,7 @@ const updateRecipe = wrapAsync(async (req, res) => {
 
   const updatedRecipe = await Recipe.findByIdAndUpdate(
     recipeId,
-    { title, description, status, category, dueDate },
+    { title, description, img, ingredients, preparationSteps },
     { new: true }
   );
 

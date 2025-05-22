@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import recipeRoute from "./routes/recipe.route.js";
 
 dotenv.config();
 // Global Variables / Environmental Variables
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/users", recipeRoute);
 
 // Error Handler
 app.use((err, req, res, next) => {

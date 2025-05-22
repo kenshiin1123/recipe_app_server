@@ -18,7 +18,7 @@ const recipeSchema = new Schema({
       name: String,
     },
   ],
-  preperationSteps: [String],
+  preparationSteps: [String],
 });
 
 export default model("Recipe", recipeSchema);
