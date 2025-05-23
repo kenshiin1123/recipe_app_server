@@ -1,7 +1,7 @@
 import AppError from "../util/AppError.js";
 import wrapAsync from "../util/wrapAsync.js";
 import User from "../models/user.model.js";
-import Recipe from "../models/recipe.js";
+import Recipe from "../models/recipe.model.js";
 
 import bcrypt from "bcrypt";
 
@@ -12,12 +12,8 @@ const getUser = wrapAsync(async (req, res) => {
     throw new AppError("ID is required", 400);
   }
 
-  const user = await User.findById(id)
-    .select("-passwordHash -__v -token -_id")
-    .populate({
-      path: "recipes",
-      select: "title description -_id",
-    });
+  const user = await User.findById(id).select("-passwordHash -__v -token");
+
   if (!user) {
     throw new AppError("User not found!", 404);
   }

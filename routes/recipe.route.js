@@ -35,6 +35,7 @@ const upload = multer({
 });
 
 router.use(authMiddleware);
+router.get("/:id/recipes/", getRecipes);
 router.post("/:id/recipes/", upload.single("img"), addRecipe);
 router.post("/:id/recipes/", addRecipe);
 router.put("/:id/recipes/:recipeId", updateRecipe);

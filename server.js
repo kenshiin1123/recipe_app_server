@@ -18,9 +18,7 @@ app.use(cookieParser());
 
 // Routes
 app.get("/", (req, res) => {
-  res.send(
-    "<center style='margin-top:5rem;'> <h1>Recipe App Server 🖥️</h1> </center>"
-  );
+  res.status(200).json({ message: "Recipe App Server" });
 });
 
 app.use("/api/auth", authRoute);

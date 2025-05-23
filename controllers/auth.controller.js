@@ -7,6 +7,7 @@ const saltRounds = 10;
 
 const register = wrapAsync(async (req, res) => {
   const { username, email, password } = req.body;
+  console.log(username, email, password);
   if (!username || !email || !password) {
     throw new AppError(
       "All fields are required: username, email, and password.",
@@ -27,7 +28,7 @@ const register = wrapAsync(async (req, res) => {
 
   //   Save User
   await user.save();
-
+  console.log("Successfully Registered a new user!", user);
   res
     .status(201)
     .json({ message: "Successfully registered user", success: true });
@@ -35,6 +36,7 @@ const register = wrapAsync(async (req, res) => {
 
 const login = wrapAsync(async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   if (!email || !password) {
     throw new AppError("Email and password is required!", 400);
   }
@@ -49,12 +51,16 @@ const login = wrapAsync(async (req, res) => {
   if (!match) {
     throw new AppError("Incorrect email or password", 401);
   }
-
   const token = generateToken(user._id);
   user.token.push(token);
   await user.save();
 
-  res.status(200).json({ message: "Successfully authenticated!", token });
+  res.status(200).json({
+    message: "Successfully authenticated!",
+    success: true,
+    token,
+    id: user._id.toString(), //BSON to string
+  });
 });
 
 export { register, login };
