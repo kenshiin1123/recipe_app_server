@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
+import cors from "cors";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
@@ -15,6 +16,7 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 // Routes
 app.get("/", (req, res) => {
